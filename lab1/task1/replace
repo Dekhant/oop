@@ -1,0 +1,76 @@
+#include "stdafx.h"
+#include <iostream>
+#include <fstream>
+#include <string>
+using namespace std;
+string ReplaceString(const string& line, const string& search, const string& replacement)
+{
+	size_t pos = 0;
+	string result;
+	if(search != "")
+		while (pos < line.length())
+		{
+			size_t foundPos = line.find(search, pos);
+			result.append(line, pos, foundPos - pos);
+			if (foundPos != string::npos)
+			{
+				result.append(replacement);
+				pos = foundPos + search.length();
+			}
+			else
+			{
+				break;
+			}
+		}
+	else {
+		result = line;
+	}
+	return result;
+}
+
+bool ReplaceAllLines(istream& input, ostream& output, const string& search, const string& replace) {
+	string line;
+	bool ended = false;
+	while (getline(input, line)) {
+		output << ReplaceString(line, search, replace) << endl;
+	}
+	ended = true;
+	return ended;
+}
+
+
+bool ReplaceAllLiniesFile(ifstream& input, ofstream& output, const string& inName, const string& outName, const string& search, const string& replace) {
+	input.open(inName);
+	if (!input.is_open()) { 
+		cout << "input.txt не открылся"; 
+		return false;
+	}
+	output.open(outName);
+	if (!output.is_open()) {
+		cout << "output.txt не открылся";
+		return false;
+	}
+	if(ReplaceAllLines(input, output, search, replace))
+		return true;
+	else 
+		return false;
+}
+
+int main(int argc, char* argv[])
+{
+	setlocale(LC_ALL, "Russian");
+	if (argc != 5)
+	{
+		std::cout << "Неверное количество аргументов\n";
+		return 1;
+	}
+	ifstream input;
+	ofstream output;
+
+	if (ReplaceAllLiniesFile(input, output, argv[1], argv[2], argv[3], argv[4])) {
+		output.flush();
+		return 0;
+	}
+	else {
+		return 1;
+	}
